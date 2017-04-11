@@ -1,0 +1,128 @@
+= PRE-EXERCISE 1
+SELECT accountId
+    FROM AddressBook
+    GROUP BY accountId
+    ORDER BY COUNT(*) DESC
+    LIMIT 1;
+SELECT addressBookId
+    FROM Entry 
+    GROUP BY addressBookId
+    ORDER BY COUNT(*) DESC
+    LIMIT 1;
+    
+
+= PRE-EXERCISE 2
+SELECT COUNT(*)
+    FROM Entry
+    WHERE subType = 'phone'
+        AND contentLineOne LIKE '3%'
+        OR contentLineOne LIKE '1_3%'
+        OR contentLineOne LIKE '_3%';
+        
+SELECT COUNT(*)
+    FROM Entry
+    WHERE type = 'home'
+        AND subType = 'phone'
+        AND contentLineOne NOT LIKE '%5%';
+
+SELECT COUNT(*)
+    FROM Entry
+    WHERE type = 'work'
+        AND subType = 'phone'
+        AND (contentLineOne LIKE '%_(___)%'
+        OR contentLineOne LIKE '%-___-%-%');
+
+
+= EXERCISE 1
+CREATE TABLE Account (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    email VARCHAR(255),
+    password VARCHAR(40),
+    createdOn DATETIME,
+    modifiedOn DATETIME
+);
+    
+CREATE TABLE AddressBook (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    accountId INT,
+    name VARCHAR(255),
+    createdOn DATETIME,
+    modifiedOn DATETIME,
+    FOREIGN KEY (accountId) REFERENCES Account(id)
+);
+
+CREATE TABLE Entry (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    addressBookId INT,
+    firstName VARCHAR(255),
+    lastName VARCHAR(255),
+    birthday DATETIME,
+    type ENUM('phone', 'address', 'electronic-mail'),
+    FOREIGN KEY (addressBookId) REFERENCES AddressBook(id)
+);
+
+CREATE TABLE Address (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    entryId INT,
+    type ENUM('home','work','other'),
+    addressLine1 VARCHAR(255),
+    addressLine2 VARCHAR(255),
+    city VARCHAR(255),
+    province VARCHAR(128),
+    country VARCHAR(128),
+    postalCode VARCHAR(10),
+    FOREIGN KEY (entryId) REFERENCES Entry(id)
+);
+
+CREATE TABLE ElectronicMail (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    entryId INT,
+    type ENUM('home','work','other'),
+    content VARCHAR(255),
+    FOREIGN KEY (entryId) REFERENCES Entry(id)
+);
+
+CREATE TABLE Phone (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    entryId INT,
+    type ENUM('home','work','other'),
+    subtype ENUM('landline','cellular','fax'),
+    content VARCHAR(255),
+    FOREIGN KEY (entryId) REFERENCES Entry(id)
+);
+    
+    
+= EXERCISE 2
+mysql -usebastienvuong Workshop3 < data/import-account.sql
+mysql -usebastienvuong Workshop3 < data/import-addressbook.sql
+mysql -usebastienvuong Workshop3 < data/import-entry.sql
+
+
+= EXERCISE 3
+SELECT LOWER(country), COUNT(*)
+    FROM Address
+    GROUP BY country
+    ORDER BY COUNT(*) DESC;
+    
+    
+= EXERCISE 4
+SELECT e.firstName
+    FROM Entry e JOIN AddressBook a
+    ON e.addressBookId = a.id
+    WHERE a.name = 'Pharetra Ut Limited';
+    
+    
+= EXERCISE 5
+SELECT content
+    FROM ElectronicMail e JOIN (
+        SELECT e.id AS temp t
+            FROM Entry e Join AddressBook a
+            ON e.addressBookId = a.id
+            WHERE a.id = 100
+    ) 
+    ON t = ElectronicMail.entryId;
+    
+SELECT e.id 
+    FROM Entry e Join AddressBook a
+    ON e.addressBookId = a.id
+    WHERE a.id = 100;
