@@ -114,15 +114,43 @@ SELECT e.firstName
     
 = EXERCISE 5
 SELECT content
-    FROM ElectronicMail e JOIN (
-        SELECT e.id AS temp t
-            FROM Entry e Join AddressBook a
-            ON e.addressBookId = a.id
-            WHERE a.id = 100
-    ) 
-    ON t = ElectronicMail.entryId;
-    
-SELECT e.id 
-    FROM Entry e Join AddressBook a
-    ON e.addressBookId = a.id
+    FROM ElectronicMail em 
+    JOIN Entry e ON em.entryId = e.id 
+    JOIN AddressBook a ON e.addressBookId = a.id
     WHERE a.id = 100;
+    
+
+= EXERCISE 6
+SELECT content 
+    FROM Phone p
+    JOIN Entry e ON p.entryId = e.id
+    WHERE e.firstName = 'Charlotte'
+    AND e.lastName = 'Jenkins';
+    
+    
+= EXERCISE 7
+SELECT SUBSTRING_INDEX(content, '@', -1)
+    FROM ElectronicMail;
+    
+    
+= EXERCISE 8
+SELECT COUNT(*), p.subType
+    FROM Phone p 
+    JOIN Entry e ON p.entryId = e.id
+    WHERE e.birthday >= "1950-10-01" AND e.birthday <= "1960-10-31"
+    GROUP BY p.subType;
+    
+    
+= EXERCISE 9
+SELECT city 
+    FROM Address 
+    WHERE country IN ('Canada','Austria','Isle of Man','Ireland','Japan');
+    
+
+= EXERCISE 10 
+UPDATE ElectronicMail
+    SET type = CASE  
+        WHEN type = 'work' THEN 'home'
+        WHEN type = 'home' THEN 'work'
+    END
+    WHERE type IN ('home','work');
